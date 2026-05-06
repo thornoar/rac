@@ -4,7 +4,7 @@
   header: [Hong Kong University of Science and Technology #h(1fr) 2026],
   // due: [Fri, Mar 28],
   sub1: [MAKSIMOVICH, Roman],
-  ext1: [TSZ, Wu Yiu],
+  ext1: [WU, Yiu Tsz],
   // ext1: [Word count: #total-words],
   // ext2: [Topic: Dark Matter],
   inset: (left: 9pt, bottom: 9pt)
