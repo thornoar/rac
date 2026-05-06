@@ -10,3 +10,6 @@ authors = [
 ]
 rust-version = "1.95.0"
 version = "0.1.0"
+
+[workspace.dependencies]
+tikv-jemallocator = "0.6.1"
