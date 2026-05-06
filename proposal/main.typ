@@ -43,5 +43,3 @@ Our intention is to accomplish the following goals:
   Nil() : forall A. List[A]
   ```
   Pattern matching on values typed as `forall A. A` will be _disallowed_, since this type yields no information about the value.
-
-  
