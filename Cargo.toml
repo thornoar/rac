@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "amyc",
+]
+
+[workspace.package]
+authors = [
+    "Roman MAKSIMOVICH <rmaksimovich@connect.ust.hk>",
+    "Yiu Tsz WU <ytwuac@connect.ust.hk>"
+]
+rust-version = "1.95.0"
+version = "0.1.0"
