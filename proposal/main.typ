@@ -23,7 +23,7 @@ Our intention is to accomplish the following goals:
   case class C1 (a_1: A_1, ..., a_m: A_m) extends T
   case class C2 (b_1: A_1, ..., b_k: A_k) extends T
 
-  // Funstions may be parametrically polymorphic
+  // Functions may be parametrically polymorphic
   def fun[A_1, ..., A_n, A] (a_1: A_1, ..., a_l: A_l): A := ... end fun
   ```
   For example,
