@@ -24,7 +24,7 @@
             '';
             installPhase = ''
               mkdir -p $out/bin
-              mv amyc $out/bin/
+              mv ./target/debug/amyc $out/bin/
             '';
             nativeBuildDepends = with pkgs; [
               cargo
