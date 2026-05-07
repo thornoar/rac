@@ -4,4 +4,4 @@
 //! Lexical analysis is first performed to produce tokens from a source code string, before that
 //! stream of tokens is parsed into an abstract syntax tree for further processing.
 
-mod lexer;
+pub mod lexer;
