@@ -3,4 +3,6 @@ use tikv_jemallocator::Jemalloc;
 #[global_allocator]
 static ALLOC: Jemalloc = Jemalloc;
 
-pub fn main() {}
+pub fn main() {
+    println!("Hello world!")
+}
