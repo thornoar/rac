@@ -22,6 +22,10 @@
             buildPhase = ''
               cargo build
             '';
+            installPhase = ''
+              mkdir -p $out/bin
+              mv amyc $out/bin/
+            '';
             nativeBuildDepends = with pkgs; [
               cargo
             ];
