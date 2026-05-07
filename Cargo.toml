@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "amyc",
+    "amyc-parser",
 ]
 resolver = "3"
 
