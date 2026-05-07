@@ -1,6 +1,7 @@
 [package]
 name = "amyc"
 authors = { workspace = true }
+edition = { workspace = true }
 version = { workspace = true }
 rust-version = { workspace = true }
 

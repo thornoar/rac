@@ -8,6 +8,7 @@ authors = [
     "Roman MAKSIMOVICH <rmaksimovich@connect.ust.hk>",
     "Yiu Tsz WU <ytwuac@connect.ust.hk>"
 ]
+edition = "2024"
 rust-version = "1.95.0"
 version = "0.1.0"
 
