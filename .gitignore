@@ -1,2 +1,7 @@
+# macOS
+.DS_Store
+
+# IntelliJ-based IDEs
 .idea
+
 target
