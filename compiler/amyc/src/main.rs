@@ -4,6 +4,10 @@
 //! pipeline to drive compilation of Amy into WebAssembly. The concept of a session is used to
 //! store certain global state (per compilation) when necessary.
 
+#![deny(clippy::pedantic)]
+#![deny(unsafe_code)]
+#![deny(warnings)]
+
 use tikv_jemallocator::Jemalloc;
 
 #[global_allocator]

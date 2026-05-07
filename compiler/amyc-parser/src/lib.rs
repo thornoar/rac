@@ -4,4 +4,8 @@
 //! Lexical analysis is first performed to produce tokens from a source code string, before that
 //! stream of tokens is parsed into an abstract syntax tree for further processing.
 
+#![deny(clippy::pedantic)]
+#![deny(unsafe_code)]
+#![deny(warnings)]
+
 pub mod lexer;
