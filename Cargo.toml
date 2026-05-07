@@ -2,6 +2,7 @@
 members = [
     "amyc",
 ]
+resolver = "3"
 
 [workspace.package]
 authors = [
