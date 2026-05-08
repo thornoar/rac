@@ -8,10 +8,9 @@
 #![deny(unsafe_code)]
 #![deny(warnings)]
 
-use tikv_jemallocator::Jemalloc;
-
-#[global_allocator]
-static ALLOC: Jemalloc = Jemalloc;
+// use tikv_jemallocator::Jemalloc;
+// #[global_allocator]
+// static ALLOC: Jemalloc = Jemalloc;
 
 pub fn main() {
     println!("Hello world!")
