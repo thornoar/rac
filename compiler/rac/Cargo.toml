@@ -1,8 +1,9 @@
 [package]
-name = "amyc-parser"
+name = "rac"
 authors = { workspace = true }
 edition = { workspace = true }
 version = { workspace = true }
 rust-version = { workspace = true }
 
 [dependencies]
+# tikv-jemallocator = { workspace = true }

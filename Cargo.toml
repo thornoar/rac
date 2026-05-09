@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "compiler/amyc",
-    "compiler/amyc-parser",
+    "compiler/rac",
+    "compiler/rac-parser",
 ]
 resolver = "3"
 
