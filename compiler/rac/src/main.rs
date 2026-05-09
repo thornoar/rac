@@ -1,6 +1,6 @@
-//! # Amyc
+//! # RAC
 //!
-//! This is the main driver program of the rewritten Amyc. It connects the moving pieces in a
+//! This is the main driver program of the rewritten RAC. It connects the moving pieces in a
 //! pipeline to drive compilation of Amy into WebAssembly. The concept of a session is used to
 //! store certain global state (per compilation) when necessary.
 

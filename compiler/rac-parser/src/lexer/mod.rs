@@ -1,6 +1,6 @@
 use std::{iter, str::CharIndices};
 
-use crate::lexer::token::Token;
+use crate::lexer::token::{Token, TokenKind};
 
 mod chars;
 pub mod token;
@@ -16,12 +16,26 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn next_token(&mut self) -> Option<Token> {
-        todo!()
+    pub fn next_token(&mut self) -> Token {
+        let Some((_, first)) = self.bump() else {
+            return Token::new(TokenKind::Eof, 0..=0);
+        };
+
+        match first {
+            _ => todo!(),
+        }
     }
 }
 
 pub fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
     let mut lexer = Lexer::new(input);
-    iter::from_fn(move || lexer.next_token())
+
+    iter::from_fn(move || {
+        let tok = lexer.next_token();
+        if tok.kind != TokenKind::Eof {
+            Some(tok)
+        } else {
+            None
+        }
+    })
 }

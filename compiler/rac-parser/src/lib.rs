@@ -1,4 +1,4 @@
-//! # Amyc Parser
+//! # RAC Parser
 //!
 //! This library holds the handwritten recursive-descent parser for Amy with error recovery.
 //! Lexical analysis is first performed to produce tokens from a source code string, before that
