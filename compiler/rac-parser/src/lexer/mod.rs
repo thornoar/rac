@@ -1,5 +1,5 @@
 use std::{iter, str::CharIndices};
-
+use crate::lexer::chars::{is_id_continue, is_id_start};
 use crate::lexer::token::{Token, TokenKind};
 
 mod chars;
@@ -17,13 +17,19 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn next_token(&mut self) -> Token {
-        let Some((_, first)) = self.bump() else {
+        let Some((i, first)) = self.bump() else {
             return Token::new(TokenKind::Eof, 0..=0);
         };
 
-        match first {
-            _ => todo!(),
-        }
+        let (kind, len) = match first {
+            c if is_id_start(c) => {
+                let consumed = self.bump_while(is_id_continue);
+                (TokenKind::Identifier, consumed)
+            }
+            _ => (TokenKind::Unknown, 1),
+        };
+        
+        Token::new(kind, i..=(i+len))
     }
 }
 

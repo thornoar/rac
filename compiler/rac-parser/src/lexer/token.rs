@@ -4,16 +4,17 @@ use std::ops::RangeInclusive;
 pub enum TokenKind {
     Eof,
     Identifier,
+    Unknown,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
-    pub range: (u32, u32), // todo(Harry): make a dedicated span type
+    pub range: (usize, usize), // todo(Harry): make a dedicated span type
 }
 
 impl Token {
-    pub fn new(kind: TokenKind, range: RangeInclusive<u32>) -> Self {
+    pub fn new(kind: TokenKind, range: RangeInclusive<usize>) -> Self {
         Self {
             kind,
             range: (*range.start(), *range.end()),
