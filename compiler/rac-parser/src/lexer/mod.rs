@@ -66,6 +66,18 @@ impl<'a> Lexer<'a> {
             '-' => (TokenKind::Minus, 1),
             '(' => (TokenKind::OpenParen, 1),
             '%' => (TokenKind::Percent, 1),
+            '|' if self.peek_first() == '|' => (TokenKind::PipePipe, 2),
+            '+' => {
+                if self.peek_first() == '+' {
+                    self.bump();
+                    (TokenKind::PlusPlus, 2)
+                } else {
+                    (TokenKind::Plus, 1)
+                }
+            }
+            ';' => (TokenKind::Semicolon, 1),
+            '/' => (TokenKind::Slash, 1),
+            '*' => (TokenKind::Star, 1),
 
             _ => (TokenKind::Unknown, 1),
         };
