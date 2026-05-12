@@ -9,7 +9,7 @@ impl<'a> Lexer<'a> {
 
     pub fn bump_while<F: Fn(char) -> bool>(&mut self, predicate: F) -> usize {
         let mut consumed = 0;
-        while predicate(self.first().1) {
+        while predicate(self.peek_first()) {
             self.bump();
             consumed += 1;
         }
@@ -17,11 +17,12 @@ impl<'a> Lexer<'a> {
         consumed
     }
 
-    pub fn first(&mut self) -> (usize, char) {
+    pub fn peek_first(&mut self) -> char {
         self.chars
             .clone()
             .next()
-            .unwrap_or((usize::MAX, Self::EOF_CHAR))
+            .map(|tup| tup.1)
+            .unwrap_or(Self::EOF_CHAR)
     }
 }
 

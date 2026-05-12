@@ -1,6 +1,9 @@
 use std::{iter, str::CharIndices};
-use crate::lexer::chars::{is_id_continue, is_id_start};
-use crate::lexer::token::{Token, TokenKind};
+
+use crate::lexer::{
+    chars::{is_id_continue, is_id_start},
+    token::{Token, TokenKind},
+};
 
 mod chars;
 pub mod token;
@@ -18,7 +21,8 @@ impl<'a> Lexer<'a> {
 
     pub fn next_token(&mut self) -> Token {
         let Some((i, first)) = self.bump() else {
-            return Token::new(TokenKind::Eof, 0..=0);
+            // todo(Harry): make EOF return an accurate range of the end of the file
+            return Token::new(TokenKind::Eof, 0..1);
         };
 
         let (kind, len) = match first {
@@ -26,10 +30,47 @@ impl<'a> Lexer<'a> {
                 let consumed = self.bump_while(is_id_continue);
                 (TokenKind::Identifier, consumed)
             }
+
+            '&' if self.peek_first() == '&' => {
+                self.bump();
+                (TokenKind::AndAnd, 2)
+            }
+            '!' => (TokenKind::Bang, 1),
+            ')' => (TokenKind::CloseParen, 1),
+            ':' => {
+                if self.peek_first() == '=' {
+                    self.bump();
+                    (TokenKind::ColonEqual, 2)
+                } else {
+                    (TokenKind::Colon, 1)
+                }
+            }
+            ',' => (TokenKind::Comma, 1),
+            '.' => (TokenKind::Dot, 1),
+            '=' => {
+                if self.peek_first() == '=' {
+                    self.bump();
+                    (TokenKind::EqualEqual, 2)
+                } else {
+                    (TokenKind::Equal, 1)
+                }
+            }
+            '<' => {
+                if self.peek_first() == '=' {
+                    self.bump();
+                    (TokenKind::LeftArrow, 2)
+                } else {
+                    (TokenKind::LessThan, 1)
+                }
+            }
+            '-' => (TokenKind::Minus, 1),
+            '(' => (TokenKind::OpenParen, 1),
+            '%' => (TokenKind::Percent, 1),
+
             _ => (TokenKind::Unknown, 1),
         };
-        
-        Token::new(kind, i..=(i+len))
+
+        Token::new(kind, i..(i + len))
     }
 }
 

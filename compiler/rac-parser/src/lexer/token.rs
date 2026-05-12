@@ -1,9 +1,31 @@
-use std::ops::RangeInclusive;
+use std::ops::Range;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TokenKind {
-    Eof,
     Identifier,
+
+    AndAnd,
+    Bang,
+    CloseParen,
+    Colon,
+    ColonEqual,
+    Comma,
+    Dot,
+    Equal,
+    EqualEqual,
+    LeftArrow,
+    LessThan,
+    Minus,
+    OpenParen,
+    Percent,
+    PipePipe,
+    Plus,
+    PlusPlus,
+    Semicolon,
+    Slash,
+    Star,
+
+    Eof,
     Unknown,
 }
 
@@ -14,10 +36,10 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(kind: TokenKind, range: RangeInclusive<usize>) -> Self {
+    pub fn new(kind: TokenKind, range: Range<usize>) -> Self {
         Self {
             kind,
-            range: (*range.start(), *range.end()),
+            range: (range.start, range.end - 1),
         }
     }
 }
