@@ -35,8 +35,13 @@ impl<'a> Lexer<'a> {
     }
 
     // Peeks n elements ahead
-    pub fn peek_n(&mut self, n: u32) -> Vec<char> {
-        panic!("")
+    pub fn peek_n(&mut self, n: usize) -> Vec<char> {
+        let mut res: Vec<char> = Vec::with_capacity(n);
+        for i in 0..n {
+            // match self
+        }
+
+        panic!()
     }
 
     pub fn new(input: &'a str) -> Self {
@@ -48,7 +53,7 @@ impl<'a> Lexer<'a> {
     pub fn next_token(&mut self) -> Token {
         let Some((i, first)) = self.bump() else {
             // todo(Harry): make EOF return an accurate range of the end of the file
-            return Token::new(TokenKind::Eof, 0..1);
+            return Token { kind: TokenKind::Eof, range: 0..1 };
         };
 
         let (kind, len) = match first {
@@ -110,11 +115,19 @@ impl<'a> Lexer<'a> {
             _ => (TokenKind::Unknown, 1),
         };
 
-        Token::new(kind, i..(i + len))
+        Token { kind, range: i..(i + len) }
     }
 }
 
-pub fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
+pub fn is_id_start(c: char) -> bool {
+    c.is_ascii_alphabetic()
+}
+
+pub fn is_id_continue(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '_'
+}
+
+fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
     let mut lexer = Lexer::new(input);
 
     iter::from_fn(move || {
@@ -125,12 +138,4 @@ pub fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
             None
         }
     })
-}
-
-pub fn is_id_start(c: char) -> bool {
-    c.is_ascii_alphabetic()
-}
-
-pub fn is_id_continue(c: char) -> bool {
-    c.is_ascii_alphanumeric() || c == '_'
 }

@@ -10,19 +10,7 @@
 
 pub mod lexer;
 pub mod token;
+pub mod tokeniter;
 
 use std::iter;
 use crate::{lexer::Lexer, token::{Token, TokenKind}};
-
-fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
-    let mut lexer = Lexer::new(input);
-
-    iter::from_fn(move || {
-        let tok = lexer.next_token();
-        if tok.kind != TokenKind::Eof {
-            Some(tok)
-        } else {
-            None
-        }
-    })
-}
