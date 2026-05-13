@@ -6,6 +6,7 @@ pub enum TokenKind {
 
     AndAnd,
     Bang,
+    CloseBracket,
     CloseParen,
     Colon,
     ColonEqual,
@@ -16,6 +17,7 @@ pub enum TokenKind {
     LeftArrow,
     LessThan,
     Minus,
+    OpenBracket,
     OpenParen,
     Percent,
     PipePipe,
@@ -25,8 +27,11 @@ pub enum TokenKind {
     Slash,
     Star,
 
+    PrimType,
+
     Eof,
     Unknown,
+    Error,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

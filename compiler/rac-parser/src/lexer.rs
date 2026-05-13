@@ -1,18 +1,44 @@
 use std::{iter, str::CharIndices};
 
-use crate::lexer::{
-    chars::{is_id_continue, is_id_start},
+use crate::{
+    // chars::{is_id_continue, is_id_start},
     token::{Token, TokenKind},
 };
-
-mod chars;
-pub mod token;
 
 pub struct Lexer<'a> {
     chars: CharIndices<'a>,
 }
 
 impl<'a> Lexer<'a> {
+    pub const EOF_CHAR: char = '\0';
+
+    pub fn bump(&mut self) -> Option<(usize, char)> {
+        self.chars.next()
+    }
+
+    pub fn bump_while<F: Fn(char) -> bool>(&mut self, predicate: F) -> usize {
+        let mut consumed = 0;
+        while predicate(self.peek_first()) {
+            self.bump();
+            consumed += 1;
+        }
+
+        consumed
+    }
+
+    pub fn peek_first(&mut self) -> char {
+        self.chars
+            .clone()
+            .next()
+            .map(|tup| tup.1)
+            .unwrap_or(Self::EOF_CHAR)
+    }
+
+    // Peeks n elements ahead
+    pub fn peek_n(&mut self, n: u32) -> Vec<char> {
+        panic!("")
+    }
+
     pub fn new(input: &'a str) -> Self {
         Self {
             chars: input.char_indices(),
@@ -36,6 +62,7 @@ impl<'a> Lexer<'a> {
                 (TokenKind::AndAnd, 2)
             }
             '!' => (TokenKind::Bang, 1),
+            ']' => (TokenKind::CloseBracket, 1),
             ')' => (TokenKind::CloseParen, 1),
             ':' => {
                 if self.peek_first() == '=' {
@@ -64,6 +91,7 @@ impl<'a> Lexer<'a> {
                 }
             }
             '-' => (TokenKind::Minus, 1),
+            '[' => (TokenKind::OpenBracket, 1),
             '(' => (TokenKind::OpenParen, 1),
             '%' => (TokenKind::Percent, 1),
             '|' if self.peek_first() == '|' => (TokenKind::PipePipe, 2),
@@ -97,4 +125,12 @@ pub fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
             None
         }
     })
+}
+
+pub fn is_id_start(c: char) -> bool {
+    c.is_ascii_alphabetic()
+}
+
+pub fn is_id_continue(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '_'
 }

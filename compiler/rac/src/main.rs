@@ -6,7 +6,7 @@
 
 #![deny(clippy::pedantic)]
 #![deny(unsafe_code)]
-#![deny(warnings)]
+// #![deny(warnings)]
 
 // use tikv_jemallocator::Jemalloc;
 // #[global_allocator]

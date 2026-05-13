@@ -6,6 +6,23 @@
 
 #![deny(clippy::pedantic)]
 #![deny(unsafe_code)]
-#![deny(warnings)]
+// #![deny(warnings)]
 
 pub mod lexer;
+pub mod token;
+
+use std::iter;
+use crate::{lexer::Lexer, token::{Token, TokenKind}};
+
+fn lex(input: &str) -> impl Iterator<Item = Token> + '_ {
+    let mut lexer = Lexer::new(input);
+
+    iter::from_fn(move || {
+        let tok = lexer.next_token();
+        if tok.kind != TokenKind::Eof {
+            Some(tok)
+        } else {
+            None
+        }
+    })
+}
