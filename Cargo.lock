@@ -7,5 +7,13 @@ name = "rac"
 version = "0.1.0"
 
 [[package]]
+name = "rac-ast"
+version = "0.1.0"
+
+[[package]]
+name = "rac-diagnostics"
+version = "0.1.0"
+
+[[package]]
 name = "rac-parser"
 version = "0.1.0"
