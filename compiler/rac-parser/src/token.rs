@@ -51,6 +51,7 @@ pub enum TokenKind {
     Eof,
     Unknown,
     Error,
+    Underscore,
 }
 
 pub type Span = Range<usize>;
@@ -61,11 +62,11 @@ pub struct Token {
     pub range: Span,
 }
 
-// impl Token {
-//     pub fn new(kind: TokenKind, range: Range<usize>) -> Self {
-//         Self {
-//             kind,
-//             range
-//         }
-//     }
-// }
+impl Token {
+    pub fn new(kind: TokenKind, range: Range<usize>) -> Self {
+        Self {
+            kind,
+            range
+        }
+    }
+}
