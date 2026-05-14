@@ -1,5 +1,3 @@
-type Name = String;
-
 pub struct Module<N> {
     name: N,
     defs: Vec<Definition<N>>,

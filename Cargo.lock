@@ -5,6 +5,12 @@ version = 4
 [[package]]
 name = "rac"
 version = "0.1.0"
+dependencies = [
+ "rac-ast",
+ "rac-diagnostics",
+ "rac-parser",
+ "rac-typecheck",
+]
 
 [[package]]
 name = "rac-ast"
@@ -17,3 +23,15 @@ version = "0.1.0"
 [[package]]
 name = "rac-parser"
 version = "0.1.0"
+dependencies = [
+ "rac-ast",
+ "rac-diagnostics",
+]
+
+[[package]]
+name = "rac-typecheck"
+version = "0.1.0"
+dependencies = [
+ "rac-ast",
+ "rac-diagnostics",
+]

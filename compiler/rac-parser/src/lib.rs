@@ -11,9 +11,10 @@
 pub mod token;
 pub mod tokeniter;
 
-// use crate::tokeniter::TokenIter;
+use rac_ast::*;
+use crate::tokeniter::TokenIter;
 
-// pub fn parse<'a> (src: &'a [u8]) -> AST<'a> {
-//     let tokens = TokenIter::new(src);
-//     ...
-// }
+pub fn parse<'a> (src: &'a [u8]) -> Module<String> {
+    let tokens = TokenIter::new(src, src.len());
+    todo!()
+}
