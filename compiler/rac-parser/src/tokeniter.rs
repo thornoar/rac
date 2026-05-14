@@ -1,14 +1,15 @@
-use crate::token::{Span, Token, TokenKind};
+use crate::token::{Token, TokenKind};
 
 #[derive(Clone, Copy, Debug)]
 pub struct TokenIter<'a> {
     src: &'a [u8],
-    start: usize
+    limit: usize,
+    position: usize
 }
 
 impl<'a> TokenIter<'a> {
-    pub fn new(src: &'a [u8]) -> Self {
-        Self { src, start: 0 }
+    pub fn new(src: &'a [u8], limit: usize) -> Self {
+        Self { src, limit, position: 0 }
     }
 }
 
@@ -16,8 +17,8 @@ impl<'a> Iterator for TokenIter<'a> {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let tok = lex_token(self.src, self.start);
-        self.start += tok.range.len();
+        let tok = lex_token(self.src, self.limit, self.position);
+        self.position = tok.range.end;
 
         if tok.kind == TokenKind::Eof {
             None
@@ -27,18 +28,29 @@ impl<'a> Iterator for TokenIter<'a> {
     }
 }
 
-fn lex_token(src: &[u8], start: usize) -> Token {
+// Produce the next token from the `start` position.
+fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
     use TokenKind::*;
+
+    if start >= limit {
+        return Token::new(Eof, start..start);
+    }
+
     let span = |l| {
         return start .. (start + l);
     };
+    let has_next: bool = start+1 < limit;
+
     match src[start] {
+        // Skip whitespace
+        c if (c as char).is_whitespace() => lex_token(src, limit, start+1),
         c if is_id_start(c) => {
             let mut end: usize = start+1;
-            while is_id_continue(src[end]) {
+            while end < limit && is_id_continue(src[end]) {
                 end += 1;
             }
             let tk: TokenKind = match str::from_utf8(&src[start..end]) {
+                // Keywords
                 Ok("abstract") => KwAbstract,
                 Ok("case") => KwCase,
                 Ok("class") => KwClass,
@@ -53,65 +65,74 @@ fn lex_token(src: &[u8], start: usize) -> Token {
                 Ok("error") => KwError,
                 Ok("end") => KwEnd,
                 Ok("_") => Underscore,
+                // Primitive types
+                Ok("String") => TypString,
+                Ok("Int") => if end + 4 <= limit && let Ok("(32)") = str::from_utf8(&src[end..(end+4)]) {
+                    end += 4;
+                    TypInt32
+                } else { Unknown },
+                Ok("Boolean") => TypBoolean,
+                Ok("Unit") => TypUnit,
+                // Literals
+                Ok("true") => LitTrue,
+                Ok("false") => LitFalse,
+                // Otherwise, it's an identifier
                 Ok(_) => Identifier,
+                Err(_) => Unknown
             };
-            Token { kind: tk, range: start..end }
+            Token::new(tk, start..end)
         }
 
-        b'&' if src[start+1] == b'&' => Token { kind: AndAnd, range: span(2) },
-        b'!' => Token { kind: Bang, range: span(1) }, // [
-        b']' => Token { kind: CloseBracket, range: span(1) }, // (
-        b')' => Token { kind: CloseParen, range: span(1) },
+        b'&' if has_next && src[start+1] == b'&' => Token::new(AndAnd, span(2)),
+        b'!' => Token::new(Bang, span(1)), // [
+        b']' => Token::new(CloseBracket, span(1)), // (
+        b')' => Token::new(CloseParen, span(1)),
         b':' => {
-            if src[start+1] == b'=' {
-                Token { ColonEqual, span(2) }
+            if has_next && src[start+1] == b'=' {
+                Token::new(ColonEqual, span(2))
             } else {
-                Token { Colon, span(1) }
+                Token::new(Colon, span(1))
             }
         },
-        b',' => Token { kind: Comma, range: span(1) },
-        b'.' => Token { kind: Dot, range: span(1) },
+        b',' => Token::new(Comma, span(1)),
+        b'.' => Token::new(Dot, span(1)),
         b'=' => {
-            if src[start+1] == '=' {
-                Token { kind: EqualEqual, range: span(2) }
+            if has_next && src[start+1] == b'=' {
+                Token::new(EqualEqual, span(2))
             } else {
-                Token { kind: Equal, range: span(1) }
+                Token::new(Equal, span(1))
             }
         },
         b'<' => {
-            if src[start+1] == '=' {
-                Token { kind: LeftArrow, range: span(2) }
+            if has_next && src[start+1] == b'=' {
+                Token::new(LeftArrow, span(2))
             } else {
-                Token { kind: LessThan, range: span(1) }
+                Token::new(LessThan, span(1))
             }
         },
-        b'-' => Token { kind: Minus, range: span(1) },
-        b'[' => Token { kind: OpenBracket, range: span(1) },
-        b'(' => Token { kind: OpenParen, range: span(1) },
-        b'%' => Token { kind: Percent, range: span(1) },
-        b'|' if src[start+1] == b'|' => Token { kind: PipePipe, range: span(2) },
+        b'-' => Token::new(Minus, span(1)),
+        b'[' => Token::new(OpenBracket, span(1)),
+        b'(' => Token::new(OpenParen, span(1)),
+        b'%' => Token::new(Percent, span(1)),
+        b'|' if has_next && src[start+1] == b'|' => Token::new(PipePipe, span(2)),
         b'+' => {
-            if src[start+1] == '+' {
-                Token { kind: PlusPlus, range: span(2) }
+            if has_next && src[start+1] == b'+' {
+                Token::new(PlusPlus, span(2))
             } else {
-                Token { kind: Plus, range: span(1) }
+                Token::new(Plus, span(1))
             }
         }
-        b';' => Token { kind: Semicolon, range: span(1) },
-        b'/' => Token { kind: Slash, range: span(1) },
-        b'*' => Token { kind: Star, range: span(1) },
+        b';' => Token::new(Semicolon, span(1)),
+        b'/' => Token::new(Slash, span(1)),
+        b'*' => Token::new(Star, span(1)),
 
-        _ => Token { kind: Unknown, range: span(1) },
+        _ => Token::new(Unknown, span(1)),
     }
 }
 
 pub fn is_id_start(c: u8) -> bool {
     c.is_ascii_alphabetic()
 }
-
-// pub fn bytes_to_str(bytes: &[u8]) -> &str {
-//
-// }
 
 pub fn is_id_continue(c: u8) -> bool {
     c.is_ascii_alphanumeric() || c == b'_'

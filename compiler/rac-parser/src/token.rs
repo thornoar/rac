@@ -30,7 +30,14 @@ pub enum TokenKind {
     Star,
 
     // Primitive types
-    PrimType,
+    TypString,
+    TypInt32,
+    TypBoolean,
+    TypUnit,
+
+    // Built-in literal values for Boolean and Unit types
+    LitTrue,
+    LitFalse,
 
     // Keywords
     KwAbstract,
@@ -48,9 +55,8 @@ pub enum TokenKind {
     KwEnd,
 
     // Misc
-    Eof,
     Unknown,
-    Error,
+    Eof,
     Underscore,
 }
 

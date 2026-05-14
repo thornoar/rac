@@ -8,9 +8,12 @@
 #![deny(unsafe_code)]
 // #![deny(warnings)]
 
-pub mod lexer;
 pub mod token;
 pub mod tokeniter;
 
-use std::iter;
-use crate::{lexer::Lexer, token::{Token, TokenKind}};
+// use crate::tokeniter::TokenIter;
+
+// pub fn parse<'a> (src: &'a [u8]) -> AST<'a> {
+//     let tokens = TokenIter::new(src);
+//     ...
+// }
