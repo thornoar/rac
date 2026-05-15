@@ -61,9 +61,25 @@ pub enum TokenKind {
     Underscore,
 }
 
-pub type Span = Range<usize>;
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct Span {
+    pub start: usize,
+    pub end: usize
+}
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+impl From<Range<usize>> for Span {
+    fn from(value: Range<usize>) -> Self {
+        Span { start: value.start, end: value.end }
+    }
+}
+
+impl From<Span> for Range<usize> {
+    fn from(value: Span) -> Self {
+        value.start .. value.end
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     pub range: Span,
@@ -73,7 +89,8 @@ impl Token {
     pub fn new(kind: TokenKind, range: Range<usize>) -> Self {
         Self {
             kind,
-            range
+            // range: Span { start: range.start, end: range.end }
+            range: Span::from(range)
         }
     }
 }

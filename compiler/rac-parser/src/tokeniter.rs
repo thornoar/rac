@@ -1,21 +1,42 @@
 use crate::token::{Token, TokenKind};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct TokenIter<'a> {
     src: &'a [u8],
     limit: usize,
-    position: usize
+    position: usize,
+    cache: Option<Token>
 }
 
 impl<'a> TokenIter<'a> {
     pub fn new(src: &'a [u8], limit: usize) -> Self {
-        Self { src, limit, position: 0 }
+        Self { src, limit, position: 0, cache: None }
     }
 
     pub fn pop(&mut self) -> Token {
-        let tok = lex_token(self.src, self.limit, self.position);
-        self.position = tok.range.end;
-        tok
+        match self.cache {
+            Some(tok) => {
+                self.cache = None;
+                self.position = tok.range.end;
+                tok
+            }
+            None => {
+                let tok = lex_token(self.src, self.limit, self.position);
+                self.position = tok.range.end;
+                tok
+            }
+        }
+    }
+
+    pub fn peek(&mut self) -> Token {
+        match self.cache {
+            Some(tok) => tok,
+            None => {
+                let tok = lex_token(self.src, self.limit, self.position);
+                self.cache = Some(tok);
+                tok
+            }
+        }
     }
 }
 
