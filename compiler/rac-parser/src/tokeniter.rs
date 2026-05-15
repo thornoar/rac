@@ -103,9 +103,9 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
         },
         b'<' => {
             if has_next && src[start+1] == b'=' {
-                Token::new(LeftArrow, span(2))
+                Token::new(LessEquals, span(2))
             } else {
-                Token::new(LessThan, span(1))
+                Token::new(Less, span(1))
             }
         },
         b'-' => Token::new(Minus, span(1)),
