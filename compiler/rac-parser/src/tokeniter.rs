@@ -32,6 +32,7 @@ impl<'a> Iterator for TokenIter<'a> {
 fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
     use TokenKind::*;
 
+    // Check if we have any characters left
     if start >= limit {
         return Token::new(Eof, start..start);
     }
@@ -43,7 +44,7 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
 
     match src[start] {
         // Skip whitespace
-        c if (c as char).is_whitespace() => lex_token(src, limit, start+1),
+        c if c.is_ascii_whitespace() => lex_token(src, limit, start+1),
         c if is_id_start(c) => {
             let mut end: usize = start+1;
             while end < limit && is_id_continue(src[end]) {
@@ -112,7 +113,18 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
         },
         b'-' => Token::new(Minus, span(1)),
         b'[' => Token::new(OpenBracket, span(1)),
-        b'(' => Token::new(OpenParen, span(1)),
+        b'(' => {
+            let mut end = start + 1;
+            while end < limit && src[end].is_ascii_whitespace() {
+                end += 1;
+            }
+            if end < limit && src[end] == b')' {
+                Token::new(LitUnit, start .. end)
+            } else {
+                Token::new(OpenParen, span(1))
+            }
+        },
+
         b'%' => Token::new(Percent, span(1)),
         b'|' if has_next && src[start+1] == b'|' => Token::new(PipePipe, span(2)),
         b'+' => {

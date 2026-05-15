@@ -38,6 +38,7 @@ pub enum TokenKind {
     // Built-in literal values for Boolean and Unit types
     LitTrue,
     LitFalse,
+    LitUnit,
 
     // Keywords
     KwAbstract,
