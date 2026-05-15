@@ -31,7 +31,7 @@ pub enum TokenKind {
 
     // Primitive types
     TypString,
-    TypInt32,
+    TypInt,
     TypBoolean,
     TypUnit,
 

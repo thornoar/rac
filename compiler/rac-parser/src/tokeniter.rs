@@ -68,10 +68,7 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
                 Ok("_") => Underscore,
                 // Primitive types
                 Ok("String") => TypString,
-                Ok("Int") => if end + 4 <= limit && let Ok("(32)") = str::from_utf8(&src[end..(end+4)]) {
-                    end += 4;
-                    TypInt32
-                } else { Unknown },
+                Ok("Int") => TypInt,
                 Ok("Boolean") => TypBoolean,
                 Ok("Unit") => TypUnit,
                 // Literals
@@ -124,7 +121,6 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
                 Token::new(OpenParen, span(1))
             }
         },
-
         b'%' => Token::new(Percent, span(1)),
         b'|' if has_next && src[start+1] == b'|' => Token::new(PipePipe, span(2)),
         b'+' => {
