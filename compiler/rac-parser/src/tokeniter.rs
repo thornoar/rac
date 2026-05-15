@@ -116,7 +116,7 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
                 end += 1;
             }
             if end < limit && src[end] == b')' {
-                Token::new(LitUnit, start .. end)
+                Token::new(LitUnit, start .. (end + 1))
             } else {
                 Token::new(OpenParen, span(1))
             }
