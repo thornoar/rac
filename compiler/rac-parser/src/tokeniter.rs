@@ -139,6 +139,7 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
         b';' => Token::new(Semicolon, span(1)),
         b'/' => Token::new(Slash, span(1)),
         b'*' => Token::new(Star, span(1)),
+        b'_' => Token::new(Underscore, span(1)),
 
         _ => Token::new(Unknown, span(1)),
     }
