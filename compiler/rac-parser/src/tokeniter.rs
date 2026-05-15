@@ -11,6 +11,12 @@ impl<'a> TokenIter<'a> {
     pub fn new(src: &'a [u8], limit: usize) -> Self {
         Self { src, limit, position: 0 }
     }
+
+    pub fn pop(&mut self) -> Token {
+        let tok = lex_token(self.src, self.limit, self.position);
+        self.position = tok.range.end;
+        tok
+    }
 }
 
 impl<'a> Iterator for TokenIter<'a> {
