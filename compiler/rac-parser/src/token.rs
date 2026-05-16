@@ -1,4 +1,5 @@
 use std::ops::Range;
+use rac_diagnostics::Span;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TokenKind {
@@ -59,24 +60,6 @@ pub enum TokenKind {
     Unknown,
     Eof,
     Underscore,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct Span {
-    pub start: usize,
-    pub end: usize
-}
-
-impl From<Range<usize>> for Span {
-    fn from(value: Range<usize>) -> Self {
-        Span { start: value.start, end: value.end }
-    }
-}
-
-impl From<Span> for Range<usize> {
-    fn from(value: Span) -> Self {
-        value.start .. value.end
-    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

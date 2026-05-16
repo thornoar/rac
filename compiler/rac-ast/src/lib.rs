@@ -1,13 +1,17 @@
+use std::collections::VecDeque;
+
+pub type ArgList<N> = VecDeque<(N, Type<N>)>;
+
 pub struct Module<N> {
     name: N,
-    defs: Vec<Definition<N>>,
+    defs: VecDeque<Definition<N>>,
     expr: Option<Expr<N>>
 }
 
 pub enum Definition<N> {
     AbstractDef(N),
-    CaseClassDef(N, Vec<Box<Type<N>>>),
-    FunDef(N, Vec<(N, Type<N>)>, Type<N>, Expr<N>),
+    CaseClassDef(N, ArgList<N>),
+    FunDef(N, ArgList<N>, Type<N>, Expr<N>),
 }
 
 pub enum Expr<N> {
@@ -38,7 +42,7 @@ pub enum Expr<N> {
     Neg(Box<Expr<N>>),
 
     // Function/constructor call
-    Call(N, Vec<Box<Expr<N>>>),
+    Call(N, VecDeque<Box<Expr<N>>>),
 
     // Control flow
     Sequence(Box<Expr<N>>, Box<Expr<N>>),
@@ -46,7 +50,7 @@ pub enum Expr<N> {
     Ite(Box<Expr<N>>, Box<Expr<N>>, Box<Expr<N>>),
 
     // Pattern matching
-    Match(Box<Expr<N>>, Vec<(Box<Expr<N>>, Box<Expr<N>>)>),
+    Match(Box<Expr<N>>, VecDeque<(Box<Expr<N>>, Box<Expr<N>>)>),
 
     // Errors
     Error(Box<Expr<N>>),
@@ -54,6 +58,7 @@ pub enum Expr<N> {
 
 // Do we even need a special pattern enum? we can just say `_` is an
 // expression, and treat patterns as expressions...
+// We can think about it later
 
 // pub enum Pattern<N> {
 //     Wildcard,
