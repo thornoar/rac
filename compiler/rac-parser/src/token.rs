@@ -41,6 +41,9 @@ pub enum TokenKind {
     LitFalse,
     LitUnit,
 
+    // Integer literals
+    LitInt,
+
     // Keywords
     KwAbstract,
     KwCase,

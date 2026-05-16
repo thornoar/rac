@@ -108,6 +108,14 @@ fn lex_token(src: &[u8], limit: usize, start: usize) -> Token {
             Token::new(tk, start..end)
         }
 
+        c if c.is_ascii_digit() => {
+            let mut end: usize = start+1;
+            while end < limit && is_id_continue(src[end]) {
+                end += 1;
+            }
+            Token::new(LitInt, start .. end)
+        }
+
         b'&' if has_next && src[start+1] == b'&' => Token::new(AndAnd, span(2)),
         b'!' => Token::new(Bang, span(1)), // [
         b']' => Token::new(CloseBracket, span(1)), // (
