@@ -17,7 +17,6 @@ impl<'a> TokenIter<'a> {
         match self.cache {
             Some(tok) => {
                 self.cache = None;
-                self.position = tok.range.end;
                 tok
             }
             None => {
@@ -34,7 +33,20 @@ impl<'a> TokenIter<'a> {
             None => {
                 let tok = lex_token(self.src, self.limit, self.position);
                 self.cache = Some(tok);
+                self.position = tok.range.end;
                 tok
+            }
+        }
+    }
+
+    pub fn consume(&mut self) -> () {
+        match self.cache {
+            Some(_) => {
+                self.cache = None;
+            },
+            None => {
+                let tok = lex_token(self.src, self.limit, self.position);
+                self.position = tok.range.end;
             }
         }
     }

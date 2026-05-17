@@ -18,19 +18,31 @@ impl From<Span> for Range<usize> {
     }
 }
 
-pub enum Result<T> {
-    Value(T),
-    Error(
-        Span, // span of the erroneous code
-        String // the error message
-    )
+pub enum Stage {
+    Parsing,
+    Resolving,
+    Typechecking
 }
 
-impl<T> Result<T> {
-    pub fn bind<V> (self, f: impl FnOnce(T) -> Result<V>) -> Result<V> {
-        match self {
-            Result::Value(t) => f(t),
-            Result::Error(sp, str) => Result::Error(sp, str)
-        }
-    }
+pub struct Report {
+    pub stage: Stage,
+    pub span: Span,
+    pub msg: String
 }
+
+// pub enum Result<T> {
+//     Value(T),
+//     Error(
+//         Span, // span of the erroneous code
+//         String // the error message
+//     )
+// }
+//
+// impl<T> Result<T> {
+//     pub fn bind<V> (self, f: impl FnOnce(T) -> Result<V>) -> Result<V> {
+//         match self {
+//             Result::Value(t) => f(t),
+//             Result::Error(sp, str) => Result::Error(sp, str)
+//         }
+//     }
+// }
