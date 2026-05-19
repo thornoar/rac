@@ -192,8 +192,82 @@ fn parse_atomic_expr<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Expr<Name
     let t1 = ts.pop();
     match t1.kind {
         TK::KwVal => {
-            expect!(ts, TK::OpenParen, "Expected an opening parenthesis after the `if` keyword");
-            
+            let var_token = expect!(ts, TK::Identifier, "Expected a variable identifier after `val`.");
+            let var_name = mkstring(src, var_token.range)?;
+            expect!(ts, TK::Colon, "Expected a colon after the variable name.");
+            let var_type = parse_type(src, ts)?;
+            expect!(ts, TK::Equal, "Expected an equal sign after the variable type");
+            let var_expr = parse_expr(src, ts)?;
+            expect!(ts, TK::Semicolon, "Expected a semicolon after a `val` declaration.");
+            let body = parse_expr(src, ts)?;
+            Ok(Expr::Let(var_name, var_type, Box::new(var_expr), Box::new(body)))
         }
+        TK::KwIf => {
+            expect!(ts, TK::OpenParen, "Expected an opening parenthesis after the `if` keyword");
+            let cond = parse_expr(src, ts)?;
+            expect!(ts, TK::CloseParen, "Expected a closing parenthesis after the `if` condition");
+            expect!(ts, TK::KwThen, "Expected the keyword `then`.");
+            let if_branch = parse_expr(src, ts)?;
+            expect!(ts, TK::KwElse, "Expected the keyword `else`.");
+            let else_branch = parse_expr(src, ts)?;
+            expect!(ts, TK::KwEnd, "An `if` statement must terminate with `end if`");
+            expect!(ts, TK::KwIf, "An `if` statement must terminate with `end if`");
+            Ok(Expr::Ite(Box::new(cond), Box::new(if_branch), Box::new(else_branch)))
+        }
+        _ => parse_infix_expr(src, ts, 7)
     }
+}
+
+//
+// Parses an expression which may contain infix operators at different levels of precedence.
+//
+// The `level` argument denotes the precedence category of infix operators that still needs to be
+// considered.
+// If an operator `op` has precedence category `n`, then `level < n` means that
+// the function will stop parsing if it sees `op` in the token stream.
+// When `level` is 0, parsing is stopped as soon as any infix operation is seen.
+//
+// The precedence categories are as follows:
+// - `match` -- level 7
+// - `||` -- level 6
+// - `&&` -- level 5
+// - `==` -- level 4
+// - `<`, `<=` -- level 3
+// - `+`, `-`, `++` -- level 2
+// - `*`, `/`, `%`  -- level 1
+//
+fn parse_infix_expr<'a> (src: &'a [u8], ts: &mut TokenIter, level: u8) -> Result<Expr<Name>, Report> {
+    if level <= 0 {
+        return parse_unary_expr(src, ts);
+    }
+    let lhs = parse_infix_expr(src, ts, level - 1)?;
+    match ts.peek().kind {
+        TK::KwMatch if level >= 7 => {
+            todo!()
+        }
+        TK::PipePipe if level >= 6 => {
+            todo!()
+        }
+        TK::AndAnd if level >= 5 => {
+            todo!()
+        }
+        TK::EqualEqual if level >= 4 => {
+            todo!()
+        }
+        TK::Less | TK::LessEquals if level >= 3 => {
+            todo!()
+        }
+        TK::Plus | TK::Minus | TK::PlusPlus if level >= 2 => {
+            todo!()
+        }
+        TK::Star | TK::Slash | TK::Percent => {
+            todo!()
+        }
+        _ => Ok(lhs)
+    }
+}
+
+// Parse an expression which may contain unary operators
+fn parse_unary_expr<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Expr<Name>, Report> {
+    todo!()
 }
