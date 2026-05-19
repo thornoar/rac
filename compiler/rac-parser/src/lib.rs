@@ -182,6 +182,18 @@ fn parse_type<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Type<Name>, Repo
     }
 }
 
+// Parses an expression, which is a sequence of one or more atomic expressions
 fn parse_expr<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Expr<Name>, Report> {
     todo!()
+}
+
+// Parses an atomic expression (i.e. not a sequence of expressions)
+fn parse_atomic_expr<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Expr<Name>, Report> {
+    let t1 = ts.pop();
+    match t1.kind {
+        TK::KwVal => {
+            expect!(ts, TK::OpenParen, "Expected an opening parenthesis after the `if` keyword");
+            
+        }
+    }
 }
