@@ -49,22 +49,27 @@ pub fn parse<'a> (src: &'a [u8]) -> Result<Module<Name>, Report> {
     parse_module(src, &mut ts)
 }
 
+// Parses a single Amy module
 fn parse_module<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Module<Name>, Report> {
     expect!(ts, TK::KwObject, "A module must start with the keyword `object`.");
     let id1 = expect!(ts, TK::Identifier, "A module must be given a valid identifier name.");
     let name = mkstring(src, id1.range)?;
     let defs = parse_many_definitions(src, ts)?;
-    let mexpr = todo!();
+    let mexpr = match ts.peek().kind {
+        TK::KwEnd => Ok(None),
+        _ => parse_expr(src, ts).map(|x| Some(x))
+    }?;
     expect!(ts, TK::KwEnd, "A module must end with the keyword `end`.");
     let id2 = expect!(ts, TK::Identifier, "A module must end with its name.");
 
     if select!(src, id2.range) != select!(src, id1.range) {
-        return error!(id2.range, "A module must end with its name.");
+        return error!(id2.range, "The names at the start and end of a module must match.");
     }
     
     Ok(Module { name: name, defs: defs, expr: mexpr })
 }
 
+// Parses a sequence of 0 or more definitions
 fn parse_many_definitions<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<VecDeque<Definition<Name>>, Report> {
     match ts.peek().kind {
         TK::KwDef | TK::KwAbstract | TK::KwCase => {
@@ -82,28 +87,42 @@ fn parse_definition<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Definition
     let kw = ts.pop();
     match kw.kind {
         TK::KwDef => {
-            let id = expect!(ts, TK::Identifier, "A function must have a valid name identifier.");
+            let id1 = expect!(ts, TK::Identifier, "A function must have a valid name identifier.");
+            let name = mkstring(src, id1.range)?;
             let args = parse_arglist(src, ts)?;
             expect!(ts, TK::Colon, "Expected a colon after the function argument list.");
             let rt = parse_type(src, ts)?;
             expect!(ts, TK::ColonEqual, "Expected `:=` after the function return type.");
             // parse the function body...
-            todo!()
+            let body = parse_expr(src, ts)?;
+            expect!(ts, TK::KwEnd, "A function body must be followed by the `end` keyword.");
+            let id2 = expect!(ts, TK::Identifier, "A function definition must have its name after the `end` keyword.");
+            if select!(src, id2.range) != select!(src, id1.range) {
+                return error!(id2.range, "The names at the start and end of a function definition must match.");
+            }
+            Ok(Definition::FunDef(name, args, rt, body))
         },
         TK::KwAbstract => {
             expect!(ts, TK::KwClass, "Expected the keyword `class` after `abstract`.");
-            let id = expect!(ts, TK::Identifier, "A function must have a valid name identifier.");
-            todo!()
+            let id = expect!(ts, TK::Identifier, "An abstract class must have a valid name identifier.");
+            let name = mkstring(src, id.range)?;
+            Ok(Definition::AbstractDef(name))
         },
         TK::KwCase => {
             expect!(ts, TK::KwClass, "Expected the keyword `class` after `case` in a definition.");
-            todo!()
+            let id = expect!(ts, TK::Identifier, "A function must have a valid name identifier.");
+            let name = mkstring(src, id.range)?;
+            let args = parse_arglist(src, ts)?;
+            expect!(ts, TK::KwExtends, "A case class definition must be ended with an `extends` clause.");
+            let parent = expect!(ts, TK::Identifier, "Expected a valid name of an abstract class.");
+            let pname = mkstring(src, parent.range)?;
+            Ok(Definition::CaseClassDef(name, args, pname))
         },
         _ => error!(kw.range, "A definition must start with either `def`, `abstract`, or `case`."),
     }
 }
 
-// parses `(x: String, y: Int(32), z: Unit)` or `()`
+// Parses `(x: String, y: Int(32), z: Unit)` or `()`
 fn parse_arglist<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<ArgList<Name>, Report> {
     expect!(ts, TK::OpenParen, "Expected an opening parenthesis to start the argument list.");
     match ts.peek().kind {
@@ -112,13 +131,12 @@ fn parse_arglist<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<ArgList<Name>
     }
 }
 
-// parses a *non-empty* argument list `x: String, y: Int(32), z: Unit \)` <- with the closing parenthesis
+// Parses a *non-empty* argument list `x: String, y: Int(32), z: Unit \)` <- with the closing parenthesis
 fn parse_many_arguments<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<ArgList<Name>, Report> {
     let arg = parse_argument(src, ts)?;
     let delim = ts.pop();
     match delim.kind {
         TK::Comma => {
-            // let arg = parse_argument(src, ts)?;
             let mut lst = parse_many_arguments(src, ts)?;
             lst.push_back(arg);
             Ok(lst)
@@ -132,7 +150,7 @@ fn parse_many_arguments<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<ArgLis
     }
 }
 
-// parses `x: String` or `y: Int(32)`
+// Parses `x: String` or `y: Int(32)`
 fn parse_argument<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<(Name, Type<Name>), Report> {
     let id = expect!(ts, TK::Identifier, "An argument must have a valid name identifier.");
     let name = mkstring(src, id.range)?;
@@ -141,7 +159,7 @@ fn parse_argument<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<(Name, Type<
     Ok((name, typ))
 }
 
-// parses `String` or `Unit` or `Int(32)`
+// Parses `String` or `Unit` or `Int(32)`
 fn parse_type<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Type<Name>, Report> {
     let typ = ts.pop();
     match typ.kind {
@@ -162,4 +180,8 @@ fn parse_type<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Type<Name>, Repo
         TK::Identifier => mkstring(src, typ.range).map(|s| Type::ClassType(s)),
         _ => error!(typ.range, "Expected either a primitive type (`Int`, `Boolean`, `String`, or `Unit`), or an identifier.")
     }
+}
+
+fn parse_expr<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Expr<Name>, Report> {
+    todo!()
 }

@@ -10,7 +10,7 @@ pub struct Module<N> {
 
 pub enum Definition<N> {
     AbstractDef(N),
-    CaseClassDef(N, ArgList<N>),
+    CaseClassDef(N, ArgList<N>, N),
     FunDef(N, ArgList<N>, Type<N>, Expr<N>),
 }
 
