@@ -75,8 +75,7 @@ impl Token {
     pub fn new(kind: TokenKind, range: Range<usize>) -> Self {
         Self {
             kind,
-            // range: Span { start: range.start, end: range.end }
-            range: Span::from(range)
+            range: Span { start: range.start, end: range.end }
         }
     }
 }

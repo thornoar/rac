@@ -3,9 +3,9 @@ use std::collections::VecDeque;
 pub type ArgList<N> = VecDeque<(N, Type<N>)>;
 
 pub struct Module<N> {
-    name: N,
-    defs: VecDeque<Definition<N>>,
-    expr: Option<Expr<N>>
+    pub name: N,
+    pub defs: VecDeque<Definition<N>>,
+    pub expr: Option<Expr<N>>
 }
 
 pub enum Definition<N> {

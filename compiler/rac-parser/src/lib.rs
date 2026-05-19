@@ -11,15 +11,12 @@
 pub mod token;
 pub mod tokeniter;
 
-use std::collections::{VecDeque, vec_deque};
+use std::collections::{VecDeque};
 use std::result::Result;
 
 use rac_ast::*;
-use rac_diagnostics::{Report, Stage};
-// use rac_diagnostics::Result::*;
-use rac_diagnostics::Span;
+use rac_diagnostics::{Report, Stage, Span, select};
 use crate::tokeniter::TokenIter;
-// use crate::token::Token;
 use crate::token::TokenKind as TK;
 
 macro_rules! expect {
@@ -61,7 +58,25 @@ fn parse_module<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Module<Name>, 
         return error!(t2.range, "A module must be given a valid identifier name.");
     }
     
-    todo!()
+    let defs = parse_many_definitions(src, ts)?;
+
+    let mexpr = todo!();
+
+    let t3 = ts.pop();
+    if t3.kind != TK::KwEnd {
+        return error!(t3.range, "A module must end with the keyword `end`.");
+    }
+    let t4 = ts.pop();
+    if t4.kind != TK::Identifier {
+        return error!(t4.range, "A module must end with its name.");
+    }
+    if select!(src, t4.range) != select!(src, t2.range) {
+        return error!(t4.range, "A module must end with its name.");
+    }
+    
+    let name = mkstring(src, t2.range)?;
+
+    Ok(Module { name: name, defs: defs, expr: mexpr })
 }
 
 fn parse_many_definitions<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<VecDeque<Definition<Name>>, Report> {
@@ -94,7 +109,7 @@ fn parse_definition<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Definition
     }
 }
 
-// parses `(x: String, y: Int(32), z: Unit)`
+// parses `(x: String, y: Int(32), z: Unit)` or `()`
 fn parse_arglist<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<ArgList<Name>, Report> {
     expect!(ts, TK::OpenParen, "Expected an opening parenthesis to start the argument list.");
     match ts.peek().kind {
@@ -145,7 +160,7 @@ fn parse_type<'a> (src: &'a [u8], ts: &mut TokenIter) -> Result<Type<Name>, Repo
             if size.kind != TK::LitInt {
                 return error!(size.range, "Expected an integer literal for the `Int` type.");
             }
-            match str::from_utf8(&src[size.range.start .. size.range.end]) {
+            match str::from_utf8(&select!(src, size.range)) {
                 Ok("32") => {
                     expect!(ts, TK::CloseParen, "Expected a closing parenthesis.");
                     Ok(Type::IntType)
